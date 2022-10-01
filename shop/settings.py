@@ -46,7 +46,8 @@ INSTALLED_APPS = [
     # external apps
     'django_extensions',
     # own apps
-    'items'
+    'items',
+    'orders'
 ]
 
 MIDDLEWARE = [
