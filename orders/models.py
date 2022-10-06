@@ -2,6 +2,7 @@ from decimal import Decimal
 
 from django.contrib.auth import get_user_model
 from django.db import models
+# from django.db.models import Sum, F, Case, When
 
 from shop.constants import MAX_DIGITS, DECIMAL_PLACES
 from shop.mixins.models_mixins import PKMixin
@@ -58,3 +59,15 @@ class Order(PKMixin):
                             self.total_amount / 100 * self.discount.amount
                     )).quantize(Decimal('.01'))
         return self.total_amount
+
+    # def get_total_amount(self):
+    #     return self.products.aggregate(
+    #         total_amount=Case(
+    #             When(
+    #                 order__discount__discount_type=DiscountTypes.VALUE,
+    #                 then=Sum('price') - F('order__discount__amount')
+    #             ),
+    #             default=Sum('price') - (Sum('price') * F('order__discount__amount') / 100), # noqa
+    #             output_field=models.DecimalField()
+    #         )
+    #     ).get('total_amount') or 0

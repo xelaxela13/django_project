@@ -18,11 +18,10 @@ class ImageSnapshotAdminMixin:
             list_display = ('image_field',) + list_display
         return list_display
 
+    @mark_safe
     def image_field(self, obj):
         if not obj.image:
             return 'No image'
-        return mark_safe(
-            f'<img src="{obj.image.url}" width="64" height="64"/>')
+        return f'<img src="{obj.image.url}" width="64" height="64"/>'
 
     image_field.short_description = 'Image snapshot'
-    image_field.allow_tags = True

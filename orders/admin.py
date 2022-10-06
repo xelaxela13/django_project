@@ -1,5 +1,4 @@
 from django.contrib import admin
-from django.utils.safestring import mark_safe
 
 from orders.models import Order, Discount
 
@@ -11,10 +10,9 @@ class OrderAdmin(admin.ModelAdmin):
     filter_horizontal = ('products',)
 
     def discounted(self, obj=None):
-        return mark_safe(obj.get_total_amount())
+        return obj.get_total_amount()
 
     discounted.short_description = 'Total amount include discount'
-    discounted.allow_tags = True
 
 
 @admin.register(Discount)
