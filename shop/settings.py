@@ -10,9 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
-import environ
 from pathlib import Path
 
+import environ
 from django.urls import reverse_lazy
 
 env = environ.Env(
@@ -51,7 +51,8 @@ INSTALLED_APPS = [
     'items',
     'orders',
     'users',
-    'feedbacks'
+    'feedbacks',
+    'main'
 ]
 
 MIDDLEWARE = [
@@ -129,12 +130,13 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
-
+STATIC_ROOT = 'static/'
+STATICFILES_DIRS = ['static_dev']
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LOGOUT_REDIRECT_URL = reverse_lazy('login')
-LOGIN_REDIRECT_URL = 'items'
-LOGIN_URL = 'login'
+LOGOUT_REDIRECT_URL = reverse_lazy('main')
+LOGIN_REDIRECT_URL = reverse_lazy('main')
+LOGIN_URL = reverse_lazy('login')
