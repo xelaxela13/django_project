@@ -1,8 +1,6 @@
-from decimal import Decimal
-
 from django.contrib.auth import get_user_model
 from django.db import models
-# from django.db.models import Sum, F, Case, When
+from django.db.models import Case, When, Sum, F
 
 from shop.constants import MAX_DIGITS, DECIMAL_PLACES
 from shop.mixins.models_mixins import PKMixin
@@ -43,7 +41,7 @@ class Order(PKMixin):
         null=True,
         blank=True
     )
-    products = models.ManyToManyField("items.Product")
+    products = models.ManyToManyField("products.Product")
     discount = models.ForeignKey(
         Discount,
         on_delete=models.SET_NULL,
@@ -51,23 +49,24 @@ class Order(PKMixin):
         blank=True
     )
 
-    def get_total_amount(self):
-        if self.discount:
-            return (self.total_amount - self.discount.amount
-                    if self.discount.discount_type == DiscountTypes.VALUE else
-                    self.total_amount - (
-                            self.total_amount / 100 * self.discount.amount
-                    )).quantize(Decimal('.01'))
-        return self.total_amount
-
     # def get_total_amount(self):
-    #     return self.products.aggregate(
-    #         total_amount=Case(
-    #             When(
-    #                 order__discount__discount_type=DiscountTypes.VALUE,
-    #                 then=Sum('price') - F('order__discount__amount')
-    #             ),
-    #             default=Sum('price') - (Sum('price') * F('order__discount__amount') / 100), # noqa
-    #             output_field=models.DecimalField()
-    #         )
-    #     ).get('total_amount') or 0
+    #     if self.discount:
+    #         return (self.total_amount - self.discount.amount
+    #                 if self.discount.discount_type == DiscountTypes.VALUE else # noqa
+    #                 self.total_amount - (
+    #                         self.total_amount / 100 * self.discount.amount
+    #                 )).quantize(Decimal('.01'))
+    #     return self.total_amount
+
+    def get_total_amount(self):
+        return self.products.aggregate(
+            total_amount=Case(
+                When(
+                    order__discount__discount_type=DiscountTypes.VALUE,
+                    then=Sum('price') - F('order__discount__amount')
+                ),
+                default=Sum('price') - (
+                        Sum('price') * F('order__discount__amount') / 100),
+                output_field=models.DecimalField()
+            )
+        ).get('total_amount') or 0

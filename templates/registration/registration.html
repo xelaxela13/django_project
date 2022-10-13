@@ -1,18 +1,18 @@
 {% extends 'base.html' %}
 {% block content %}
-    <section class="login">
+    <section class="registration">
         <div class="container">
             <div class="row">
                 <div class="col col-lg-4 offset-lg-4">
-                    <h2>Login</h2>
+                    <h2>Registration</h2>
                     <form method="post">
                         {% include 'parts/forms/simple_form.html' with form=form %}
                         <input class="btn btn-primary mt-3" type="submit"
-                               value="Login">
+                               value="Registration">
                     </form>
                     <p class="mt-3 text-center">
-                        <span>Don`t have account?</span>
-                        <a href="{% url 'registration' %}">Registration</a>
+                        <span>Have account?</span>
+                        <a href="{% url 'login' %}">Login</a>
                     </p>
                 </div>
             </div>

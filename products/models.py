@@ -1,6 +1,5 @@
 from os import path
 
-from django.core.validators import MinValueValidator
 from django.db import models
 
 from shop.mixins.models_mixins import PKMixin
@@ -21,30 +20,23 @@ class Category(PKMixin):
         return self.name
 
 
-class Item(PKMixin):
+class Product(PKMixin):
     name = models.CharField(max_length=255)
     description = models.TextField()
     image = models.ImageField(upload_to=upload_image)
     category = models.ForeignKey(
-        "items.Category",
+        "products.Category",
         on_delete=models.CASCADE
     )
-
-    def __str__(self):
-        return f"{self.name} | {self.category}"
-
-
-class Product(PKMixin):
-    name = models.CharField(max_length=255)
     price = models.PositiveSmallIntegerField(
-        validators=[MinValueValidator(1)]
+        default=0
     )
     sku = models.CharField(
         max_length=32,
         blank=True,
         null=True
     )
-    items = models.ManyToManyField(Item)
+    products = models.ManyToManyField('products.Product', blank=True)
 
     def __str__(self):
         return f'{self.name} | {self.price} | {self.sku}'

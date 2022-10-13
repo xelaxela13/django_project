@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path, include
 
 from feedbacks.urls import urlpatterns as feedbacks_urlpatterns
-from items.urls import urlpatterns as items_urlpatterns
+from products.urls import urlpatterns as items_urlpatterns
 from main.urls import urlpatterns as main_urlpatterns
 from users.urls import urlpatterns as users_urlpatterns
 
