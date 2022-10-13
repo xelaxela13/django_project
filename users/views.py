@@ -1,7 +1,9 @@
 from django.contrib.auth import login
-from django.views.generic import TemplateView
+from django.urls import reverse_lazy
+from django.views.generic import TemplateView, FormView
 
 from users.forms import LoginForm
+from users.model_forms import RegistrationForm
 
 
 # todo remove
@@ -20,3 +22,13 @@ class LoginView(TemplateView):
         if form.is_valid():
             login(request, form.user)
         return self.get(request, form=form, *args, **kwargs)
+
+
+class RegistrationView(FormView):
+    form_class = RegistrationForm
+    template_name = 'registration/registration.html'
+    success_url = reverse_lazy('main')
+
+    def form_valid(self, form):
+        login(self.request, form.save())
+        return super().form_valid(form)
