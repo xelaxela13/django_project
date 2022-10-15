@@ -1,6 +1,10 @@
 {% extends 'base.html' %}
+{% load breadcrumbs %}
 {% load static %}
-
+{% block breadcrumbs %}
+    {% breadcrumbs 'Home,main,0' 'Products,products,1' as tags %}
+    {% include 'parts/breadcrumbs.html' with tags=tags %}
+{% endblock breadcrumbs %}
 {% block content %}
     <section>
         <div class="container">
@@ -19,6 +23,9 @@
                                 <p class="card-text">
                                     {{ product.description|truncatewords:16 }}
                                 </p>
+                                <p>
+                                    <a href="{% url 'product_detail' product.id %}">Details...</a>
+                                </p>
                                 {% if product.products.exists %}
                                     <p>Including:</p>
                                     {% for sub in product.products.iterator %}
@@ -32,12 +39,16 @@
                                         </div>
                                     {% endfor %}
                                 {% endif %}
-                                <div class="h3">
-                                    {{ product.price }} UAH
+                                <div class="text-center">
+                                    <div class="h3">
+                                        {{ product.price }} UAH
+                                    </div>
+                                    <p>
+                                        <a href="#" class="btn btn-primary">
+                                            Add to cart</a>
+                                    </p>
                                 </div>
-                                <a href="{% url 'product_detail' product.id  %}">Details...</a>
-                                <a href="#" class="btn btn-primary">Add to
-                                    cart</a>
+
                             </div>
                         </div>
                     </div>
