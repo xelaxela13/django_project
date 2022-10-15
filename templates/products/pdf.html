@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Products</title>
+</head>
+<body>
+<h1>Products</h1>
+
+{% for product in products %}
+    <div>
+        <p>
+            <img style="height: 150px;"
+                 src="{{ domain }}{{ product.image.url }}">
+        </p>
+        <p>
+            {{ product.name }}
+        </p>
+        <p>{{ product.description }}</p>
+        <p>
+        <h3>{{ product.price }} грн.</h3>
+        </p>
+        <hr>
+    </div>
+{% endfor %}
+</body>
+</html>
