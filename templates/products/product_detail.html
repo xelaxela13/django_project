@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+    <section>
+        <div class="container">
+            <div class="row">
+                <div class="col-12 col-lg-6 offset-lg-3">
+                    <div class="card mb-3">
+                        <figure class="text-center">
+                            <img src="{{ product.image.url }}"
+                                 class="product-image p-3"
+                                 alt="{{ product.name }}">
+                        </figure>
+                        <div class="card-body">
+                            <h5 class="card-title">{{ product.name }}</h5>
+                            <p class="small">{{ product.category.name }}</p>
+                            <p class="small">{{ product.sku }}</p>
+                            <p class="card-text">
+                                {{ product.description }}
+                            </p>
+                            {% if product.products.exists %}
+                                <p>Including:</p>
+                                {% for sub in product.products.iterator %}
+                                    <div class="d-inline-flex flex-column rounded border p-2">
+                                        <p>{{ sub.name }}</p>
+                                        <figure class="text-center d-inline">
+                                            <img src="{{ sub.image.url }}"
+                                                 class="product-image p-3"
+                                                 alt="{{ product.name }}">
+                                        </figure>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                            <div class="h3">
+                                {{ product.price }} UAH
+                            </div>
+                            <a href="#" class="btn btn-primary">Add to
+                                cart</a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+{% endblock content %}
