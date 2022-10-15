@@ -1,4 +1,9 @@
 {% extends 'base.html' %}
+{% load breadcrumbs %}
+{% block breadcrumbs %}
+    {% breadcrumbs 'Home,main,0' 'Feedbacks,feedbacks,1' as tags %}
+    {% include 'parts/breadcrumbs.html' with tags=tags %}
+{% endblock breadcrumbs %}
 {% block content %}
     <section class="feedback">
         <div class="container">
@@ -16,6 +21,10 @@
                     <div class="col-12 col-lg-4">
                         <div class="card">
                             <div class="card-body">
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                {{ feedback.rating }}
+                                <span class="visually-hidden">unread messages</span>
+                              </span>
                                 {{ feedback.text }}
                             </div>
                         </div>
