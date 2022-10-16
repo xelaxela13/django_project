@@ -10,11 +10,13 @@
             <div class="row">
                 <div class="col-12 col-lg-6 offset-lg-3">
                     <div class="card mb-3">
-                        <figure class="text-center">
-                            <img src="{{ product.image.url }}"
-                                 class="product-image p-3"
-                                 alt="{{ product.name }}">
-                        </figure>
+                        {% if product.image %}
+                            <figure class="text-center">
+                                <img src="{{ product.image.url }}"
+                                     class="product-image p-3"
+                                     alt="{{ product.name }}">
+                            </figure>
+                        {% endif %}
                         <div class="card-body">
                             <h5 class="card-title">{{ product.name }}</h5>
                             <p class="small">{{ product.category.name }}</p>

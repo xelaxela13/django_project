@@ -12,11 +12,13 @@
                 {% for product in object_list %}
                     <div class="col {% if product.products.exists %}col-lg-6{% else %}col-lg-3{% endif %}">
                         <div class="card mb-3">
+                        {% if product.image %}
                             <figure class="text-center">
                                 <img src="{{ product.image.url }}"
                                      class="product-image p-3"
                                      alt="{{ product.name }}">
                             </figure>
+                        {% endif %}
                             <div class="card-body">
                                 <h5 class="card-title">{{ product.name }}</h5>
                                 <p class="small">{{ product.category.name }}</p>

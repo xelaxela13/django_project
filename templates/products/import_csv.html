@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% load breadcrumbs %}
+{% block breadcrumbs %}
+    {% breadcrumbs 'Home,main,0' 'Products,products,0' 'Import,import_csv,1' as tags %}
+    {% include 'parts/breadcrumbs.html' with tags=tags %}
+{% endblock breadcrumbs %}
+{% block content %}
+    <section class="import-csv">
+        <div class="container">
+            <div class="row">
+                <div class="col col-lg-4 offset-lg-4 mb-3">
+                    <h2>Import CSV</h2>
+                    <form method="post" enctype="multipart/form-data">
+                        {% include 'parts/forms/simple_form.html' %}
+                        <input class="btn btn-primary mt-3" type="submit"
+                               value="Submit">
+                    </form>
+                </div>
+                <div class="d-none d-lg-block col-lg-4"></div>
+            </div>
+        </div>
+    </section>
+{% endblock content %}
