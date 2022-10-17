@@ -2,6 +2,7 @@ from os import path
 
 from django.db import models
 
+from shop.constants import MAX_DIGITS, DECIMAL_PLACES
 from shop.mixins.models_mixins import PKMixin
 
 
@@ -28,7 +29,9 @@ class Product(PKMixin):
         "products.Category",
         on_delete=models.CASCADE
     )
-    price = models.PositiveSmallIntegerField(
+    price = models.DecimalField(
+        max_digits=MAX_DIGITS,
+        decimal_places=DECIMAL_PLACES,
         default=0
     )
     sku = models.CharField(

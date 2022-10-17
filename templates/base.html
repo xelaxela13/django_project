@@ -16,6 +16,11 @@
 {% block header %}
     {% include 'parts/header.html' %}
 {% endblock header %}
+
+{% block breadcrumbs %}
+    {% include 'parts/breadcrumbs.html' with tags=tags %}
+{% endblock breadcrumbs %}
+
 {% block content %}
 {% endblock content %}
 {% block footer %}
