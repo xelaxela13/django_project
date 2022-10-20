@@ -53,7 +53,8 @@ INSTALLED_APPS = [
     'orders',
     'users',
     'feedbacks',
-    'main'
+    'main',
+    'tracking'
 ]
 
 MIDDLEWARE = [
@@ -64,10 +65,11 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'shop.middlewares.ErrorTraceMiddleware'
 ]
 
 ROOT_URLCONF = 'shop.urls'
-
+APPEND_SLASH = True
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',

@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.db.models import Case, When, Sum, F
+from django_lifecycle import LifecycleModelMixin, hook, AFTER_UPDATE
 
 from shop.constants import MAX_DIGITS, DECIMAL_PLACES
 from shop.mixins.models_mixins import PKMixin
@@ -29,7 +30,7 @@ class Discount(PKMixin):
                f"{DiscountTypes(self.discount_type).label}"
 
 
-class Order(PKMixin):
+class Order(LifecycleModelMixin, PKMixin):
     total_amount = models.DecimalField(
         max_digits=MAX_DIGITS,
         decimal_places=DECIMAL_PLACES,
@@ -70,3 +71,9 @@ class Order(PKMixin):
                 output_field=models.DecimalField()
             )
         ).get('total_amount') or 0
+
+    @hook(AFTER_UPDATE)
+    def order_after_update(self):
+        if self.products.exists():
+            self.total_amount = self.get_total_amount()
+            self.save(update_fields=('total_amount',), skip_hooks=True)
