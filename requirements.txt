@@ -6,3 +6,4 @@ Pillow==9.2.0
 ipdb==0.13.9
 Faker==15.0.0
 weasyprint==56.1
+django-lifecycle==1.0.0
