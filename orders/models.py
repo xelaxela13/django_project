@@ -49,6 +49,12 @@ class Order(LifecycleModelMixin, PKMixin):
         null=True,
         blank=True
     )
+    is_active = models.BooleanField(default=True)
+    is_paid = models.BooleanField(default=False)
+
+    @property
+    def is_current_order(self):
+        return self.is_active and not self.is_paid
 
     # def get_total_amount(self):
     #     if self.discount:

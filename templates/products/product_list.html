@@ -46,8 +46,7 @@
                                         {{ product.price }} UAH
                                     </div>
                                     <p>
-                                        <a href="#" class="btn btn-primary">
-                                            Add to cart</a>
+                                        {% include 'parts/forms/add_to_cart.html' with product_id=product.id %}
                                     </p>
                                 </div>
 
