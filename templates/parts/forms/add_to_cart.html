@@ -1,4 +1,4 @@
-<form method="post" action="{% url 'add_to_cart' %}">
+<form method="post" action="{% url 'update_cart' 'add' %}">
     {% csrf_token %}
     <input type="hidden" value="{{ product_id }}" name="product">
     <input type="submit" class="btn btn-primary" value="Add to cart">
