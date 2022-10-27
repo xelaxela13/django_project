@@ -1,7 +1,8 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.db.models import Case, When, Sum, F
-from django_lifecycle import LifecycleModelMixin, hook, AFTER_UPDATE
+from django_lifecycle import LifecycleModelMixin, hook, AFTER_UPDATE, \
+    BEFORE_UPDATE
 
 from shop.constants import MAX_DIGITS, DECIMAL_PLACES
 from shop.mixins.models_mixins import PKMixin
@@ -42,13 +43,29 @@ class Order(LifecycleModelMixin, PKMixin):
         null=True,
         blank=True
     )
-    products = models.ManyToManyField("products.Product")
+    products = models.ManyToManyField(
+        "products.Product",
+        through='orders.OrderProductRelation'
+    )
     discount = models.ForeignKey(
         Discount,
         on_delete=models.SET_NULL,
         null=True,
         blank=True
     )
+    is_active = models.BooleanField(default=True)
+    is_paid = models.BooleanField(default=False)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['user'],
+                                    condition=models.Q(is_active=True),
+                                    name='unique_is_active')
+        ]
+
+    @property
+    def is_current_order(self):
+        return self.is_active and not self.is_paid
 
     # def get_total_amount(self):
     #     if self.discount:
@@ -60,14 +77,22 @@ class Order(LifecycleModelMixin, PKMixin):
     #     return self.total_amount
 
     def get_total_amount(self):
-        return self.products.aggregate(
+        return self.products.through.objects.annotate(
+            full_price=F('product__price') * F('quantity')
+        ).aggregate(
             total_amount=Case(
                 When(
                     order__discount__discount_type=DiscountTypes.VALUE,
-                    then=Sum('price') - F('order__discount__amount')
+                    then=Sum('full_price') - F('order__discount__amount')
                 ),
-                default=Sum('price') - (
-                        Sum('price') * F('order__discount__amount') / 100),
+                When(
+                    order__discount__discount_type=DiscountTypes.PERCENT,
+                    then=Sum('full_price') - (
+                            Sum('full_price'
+                                ) * F('order__discount__amount') / 100
+                    )
+                ),
+                default=Sum('full_price'),
                 output_field=models.DecimalField()
             )
         ).get('total_amount') or 0
@@ -77,3 +102,23 @@ class Order(LifecycleModelMixin, PKMixin):
         if self.products.exists():
             self.total_amount = self.get_total_amount()
             self.save(update_fields=('total_amount',), skip_hooks=True)
+
+    @hook(BEFORE_UPDATE, when='is_paid', has_changed=True, was=False)
+    def order_is_paid(self):
+        self.is_active = False
+
+
+class OrderProductRelation(models.Model):
+    order = models.ForeignKey(
+        Order,
+        on_delete=models.CASCADE
+    )
+    product = models.ForeignKey(
+        'products.Product',
+        on_delete=models.CASCADE,
+        related_name='orders'
+    )
+    quantity = models.PositiveSmallIntegerField(default=1)
+
+    class Meta:
+        unique_together = ('order', 'product')

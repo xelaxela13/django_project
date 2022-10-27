@@ -4,6 +4,7 @@ from django.db import models
 
 from shop.constants import MAX_DIGITS, DECIMAL_PLACES
 from shop.mixins.models_mixins import PKMixin
+from shop.model_choices import Currency
 
 
 def upload_image(instance, filename):
@@ -33,6 +34,11 @@ class Product(PKMixin):
         max_digits=MAX_DIGITS,
         decimal_places=DECIMAL_PLACES,
         default=0
+    )
+    currency = models.CharField(
+        max_length=3,
+        choices=Currency.choices,
+        default=Currency.UAH
     )
     sku = models.CharField(
         max_length=32,
