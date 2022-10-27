@@ -88,7 +88,8 @@ class Order(LifecycleModelMixin, PKMixin):
                 When(
                     order__discount__discount_type=DiscountTypes.PERCENT,
                     then=Sum('full_price') - (
-                        Sum('full_price') * F('order__discount__amount') / 100
+                            Sum('full_price'
+                                ) * F('order__discount__amount') / 100
                     )
                 ),
                 default=Sum('full_price'),
@@ -101,7 +102,6 @@ class Order(LifecycleModelMixin, PKMixin):
         if self.products.exists():
             self.total_amount = self.get_total_amount()
             self.save(update_fields=('total_amount',), skip_hooks=True)
-
 
     @hook(BEFORE_UPDATE, when='is_paid', has_changed=True, was=False)
     def order_is_paid(self):
