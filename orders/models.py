@@ -102,6 +102,7 @@ class Order(LifecycleModelMixin, PKMixin):
             self.total_amount = self.get_total_amount()
             self.save(update_fields=('total_amount',), skip_hooks=True)
 
+
     @hook(BEFORE_UPDATE, when='is_paid', has_changed=True, was=False)
     def order_is_paid(self):
         self.is_active = False
