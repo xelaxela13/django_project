@@ -1,5 +1,6 @@
 from os import path
 
+from django.core.cache import cache
 from django.db import models
 
 from shop.constants import MAX_DIGITS, DECIMAL_PLACES
@@ -49,3 +50,15 @@ class Product(PKMixin):
 
     def __str__(self):
         return f'{self.name} | {self.price} | {self.sku}'
+
+    @classmethod
+    def _cache_key(cls):
+        return 'products'
+
+    @classmethod
+    def get_products(cls):
+        products = cache.get(cls._cache_key())
+        if not products:
+            products = Product.objects.all()
+            cache.set(cls._cache_key(), products)
+        return products
