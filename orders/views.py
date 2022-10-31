@@ -4,7 +4,8 @@ from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views.generic import RedirectView, TemplateView
 
-from orders.forms import UpdateCartOrderForm, RecalculateCartForm
+from orders.forms import UpdateCartOrderForm, RecalculateCartForm, \
+    ApplyDiscountForm
 from orders.mixins import GetCurrentOrderMixin
 
 
@@ -49,4 +50,14 @@ class RecalculateCartView(GetCurrentOrderMixin, RedirectView):
         form = RecalculateCartForm(request.POST, instance=self.get_object())
         if form.is_valid():
             form.save()
+        return self.get(request, *args, **kwargs)
+
+
+class ApplyDiscountView(GetCurrentOrderMixin, RedirectView):
+    url = reverse_lazy('cart')
+
+    def post(self, request, *args, **kwargs):
+        form = ApplyDiscountForm(request.POST, order=self.get_object())
+        if form.is_valid():
+            form.apply()
         return self.get(request, *args, **kwargs)

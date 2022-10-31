@@ -107,6 +107,10 @@ class Order(LifecycleModelMixin, PKMixin):
     def order_is_paid(self):
         self.is_active = False
 
+    def pay(self):
+        self.is_paid = True
+        self.save()
+
 
 class OrderProductRelation(models.Model):
     order = models.ForeignKey(

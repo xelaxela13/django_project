@@ -1,6 +1,7 @@
 from django import forms
 from django.core.exceptions import ValidationError
 
+from orders.models import Discount
 from products.models import Product
 
 
@@ -19,6 +20,12 @@ class UpdateCartOrderForm(forms.Form):
         return product
 
     def save(self, action):
+        if action == 'clear':
+            self.instance.products.clear()
+            return
+        elif action == 'pay':
+            self.instance.pay()
+            return
         getattr(self.instance.products, action)(self.cleaned_data['product'])
 
 
@@ -48,3 +55,27 @@ class RecalculateCartForm(forms.Form):
                     .filter(product_id=self.cleaned_data[f'product_{index}']) \
                     .update(quantity=self.cleaned_data[f'quantity_{index}'])
         return self.instance
+
+
+class ApplyDiscountForm(forms.ModelForm):
+    class Meta:
+        model = Discount
+        fields = ('code',)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, *kwargs)
+        self.order = kwargs['order']
+
+    def clean_code(self):
+        try:
+            self.instance = Discount.objects.get(
+                code=self.cleaned_data['code'],
+                is_active=True
+            )
+        except Discount.DoesNotExist:
+            raise ValidationError('Wrong discount code.')
+        return self.cleaned_data['code']
+
+    def apply(self):
+        self.order.discount = self.instance
+        self.order.save(update_fields=('discount',))
