@@ -1,3 +1,5 @@
+import decimal
+
 from django.db import models
 
 from shop.constants import MAX_DIGITS, DECIMAL_PLACES
@@ -24,3 +26,11 @@ class CurrencyHistory(PKMixin):
 
     def __str__(self):
         return f'{self.currency} {self.sale} {self.created_at}'
+
+    @classmethod
+    def last_curs(cls, currency_code, attr='sale') -> decimal.Decimal:
+        return getattr(cls.objects.filter(
+            currency=currency_code
+        ).order_by(
+            '-created_at'
+        ).first(), attr, 1)

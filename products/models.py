@@ -3,6 +3,7 @@ from os import path
 from django.core.cache import cache
 from django.db import models
 
+from currencies.models import CurrencyHistory
 from shop.constants import MAX_DIGITS, DECIMAL_PLACES
 from shop.mixins.models_mixins import PKMixin
 from shop.model_choices import Currency
@@ -62,3 +63,14 @@ class Product(PKMixin):
             products = Product.objects.all()
             cache.set(cls._cache_key(), products)
         return products
+
+    @property
+    def exchange_price(self):
+        key = f'exchange_price_{self.id}'
+        exchange_price = cache.get(key)
+        if not exchange_price:
+            exchange_price = round(self.price * CurrencyHistory.last_curs(
+                self.currency
+            ), 2)
+            cache.set(key, exchange_price)
+        return exchange_price
