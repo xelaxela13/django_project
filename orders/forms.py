@@ -6,13 +6,13 @@ from products.models import Product
 
 
 class UpdateCartOrderForm(forms.Form):
-    product = forms.UUIDField(required=True)
+    product = forms.UUIDField()
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, *kwargs)
         self.instance = kwargs['instance']
 
-    def clean_product_id(self):
+    def clean_product(self):
         try:
             product = Product.objects.get(id=self.cleaned_data['product'])
         except Product.DoesNotExist:
@@ -36,7 +36,7 @@ class RecalculateCartForm(forms.Form):
         self.instance = kwargs['instance']
         self.fields = {k: forms.IntegerField() if k.startswith(
             'quantity') else forms.UUIDField() for k in self.data.keys() if
-                       k != 'csrfmiddlewaretoken'}
+                       k.startswith(('quantity', 'product'))}
 
     def save(self):
         """
@@ -52,7 +52,8 @@ class RecalculateCartForm(forms.Form):
             if k.startswith('product_'):
                 index = k.split('_')[-1]
                 self.instance.products.through.objects \
-                    .filter(product_id=self.cleaned_data[f'product_{index}']) \
+                    .filter(order=self.instance,
+                            product_id=self.cleaned_data[f'product_{index}']) \
                     .update(quantity=self.cleaned_data[f'quantity_{index}'])
         return self.instance
 

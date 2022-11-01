@@ -40,15 +40,11 @@
                                                    value="{{ product_relation.product_id }}">
                                         </td>
                                         <td>{{ product_relation.product.exchange_price }}</td>
-                                        <td>{{ product_relation.full_price }}</td>
                                         <td>
-                                            <input type="hidden"
-                                                   value="{{ product_relation.product.id }}"
-                                                   name="product">
-                                            <input type="submit"
-                                                   class="btn btn-danger"
-                                                   value="X"
-                                                   formaction="{% url 'update_cart' 'remove' %}">
+                                            {% widthratio product_relation.full_price 1 product_relation.product.curs %}
+                                        </td>
+                                        <td>
+
                                         </td>
                                     </tr>
                                 {% endfor %}

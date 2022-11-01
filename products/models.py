@@ -1,3 +1,4 @@
+import decimal
 from os import path
 
 from django.core.cache import cache
@@ -69,8 +70,10 @@ class Product(PKMixin):
         key = f'exchange_price_{self.id}'
         exchange_price = cache.get(key)
         if not exchange_price:
-            exchange_price = round(self.price * CurrencyHistory.last_curs(
-                self.currency
-            ), 2)
+            exchange_price = round(self.price * self.curs, 2)
             cache.set(key, exchange_price)
         return exchange_price
+
+    @property
+    def curs(self) -> decimal.Decimal:
+        return CurrencyHistory.last_curs(self.currency)

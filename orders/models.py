@@ -1,6 +1,8 @@
+import decimal
+
 from django.contrib.auth import get_user_model
 from django.db import models
-from django.db.models import Case, When, Sum, F
+from django.db.models import F
 from django_lifecycle import LifecycleModelMixin, hook, AFTER_UPDATE, \
     BEFORE_UPDATE
 
@@ -67,35 +69,47 @@ class Order(LifecycleModelMixin, PKMixin):
     def is_current_order(self):
         return self.is_active and not self.is_paid
 
-    # def get_total_amount(self):
-    #     if self.discount:
-    #         return (self.total_amount - self.discount.amount
-    #                 if self.discount.discount_type == DiscountTypes.VALUE else # noqa
-    #                 self.total_amount - (
-    #                         self.total_amount / 100 * self.discount.amount
-    #                 )).quantize(Decimal('.01'))
-    #     return self.total_amount
+    def get_products_through(self):
+        return self.products.through.objects \
+            .filter(order=self) \
+            .select_related('product') \
+            .annotate(full_price=F('product__price') * F('quantity'))
 
     def get_total_amount(self):
-        return self.products.through.objects.annotate(
-            full_price=F('product__price') * F('quantity')
-        ).aggregate(
-            total_amount=Case(
-                When(
-                    order__discount__discount_type=DiscountTypes.VALUE,
-                    then=Sum('full_price') - F('order__discount__amount')
-                ),
-                When(
-                    order__discount__discount_type=DiscountTypes.PERCENT,
-                    then=Sum('full_price') - (
-                            Sum('full_price'
-                                ) * F('order__discount__amount') / 100
-                    )
-                ),
-                default=Sum('full_price'),
-                output_field=models.DecimalField()
-            )
-        ).get('total_amount') or 0
+        total_amount = 0
+        for product_relation in self.get_products_through().iterator():
+            total_amount += product_relation.full_price * product_relation.product.curs  # noqa
+
+        if self.discount:
+            total_amount = (
+                total_amount - self.discount.amount
+                if self.discount.discount_type == DiscountTypes.VALUE else
+                total_amount - (
+                        self.total_amount / 100 * self.discount.amount
+                )
+            ).quantize(decimal.Decimal('.01'))
+        return total_amount
+
+    # def get_total_amount(self):
+    #     return self.products.through.objects.annotate(
+    #         full_price=F('product__price') * F('quantity')
+    #     ).aggregate(
+    #         total_amount=Case(
+    #             When(
+    #                 order__discount__discount_type=DiscountTypes.VALUE,
+    #                 then=Sum('full_price') - F('order__discount__amount')
+    #             ),
+    #             When(
+    #                 order__discount__discount_type=DiscountTypes.PERCENT,
+    #                 then=Sum('full_price') - (
+    #                         Sum('full_price'
+    #                             ) * F('order__discount__amount') / 100
+    #                 )
+    #             ),
+    #             default=Sum('full_price'),
+    #             output_field=models.DecimalField()
+    #         )
+    #     ).get('total_amount') or 0
 
     @hook(AFTER_UPDATE)
     def order_after_update(self):

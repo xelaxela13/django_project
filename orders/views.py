@@ -1,5 +1,4 @@
 from django.contrib.auth.decorators import login_required
-from django.db.models import F
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views.generic import RedirectView, TemplateView
@@ -25,9 +24,7 @@ class CartView(GetCurrentOrderMixin, TemplateView):
         return context
 
     def get_queryset(self):
-        return self.get_object().products.through.objects \
-            .select_related('product') \
-            .annotate(full_price=F('product__price') * F('quantity'))
+        return self.get_object().get_products_through()
 
 
 class UpdateCartView(GetCurrentOrderMixin, RedirectView):

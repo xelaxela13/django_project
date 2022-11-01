@@ -33,4 +33,4 @@ class CurrencyHistory(PKMixin):
             currency=currency_code
         ).order_by(
             '-created_at'
-        ).first(), attr, 1)
+        ).first(), attr, decimal.Decimal('1.00'))
