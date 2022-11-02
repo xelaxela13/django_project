@@ -6,18 +6,21 @@ from products.models import Product
 
 
 class UpdateCartOrderForm(forms.Form):
-    product = forms.UUIDField()
+    product = forms.UUIDField(required=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, *kwargs)
         self.instance = kwargs['instance']
 
-    def clean_product(self):
-        try:
-            product = Product.objects.get(id=self.cleaned_data['product'])
-        except Product.DoesNotExist:
-            raise ValidationError('Wrong product id.')
-        return product
+    def clean(self):
+        # todo divide logic
+        product_id = self.cleaned_data.get('product')
+        if product_id:
+            try:
+                Product.objects.get(id=product_id)
+            except Product.DoesNotExist:
+                raise ValidationError('Wrong product id.')
+        return self.cleaned_data
 
     def save(self, action):
         if action == 'clear':
