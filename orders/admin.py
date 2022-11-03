@@ -11,7 +11,8 @@ class OrderProductRelationInline(admin.TabularInline):
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
     readonly_fields = ('discounted',)
-    list_display = ('id', 'user', 'total_amount', 'discount', 'discounted')
+    list_display = ('id', 'user', 'total_amount', 'discount', 'discounted',
+                    'is_active')
     inlines = (OrderProductRelationInline,)
 
     def discounted(self, obj=None):

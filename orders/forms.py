@@ -1,24 +1,34 @@
 from django import forms
 from django.core.exceptions import ValidationError
 
+from orders.models import Discount
 from products.models import Product
 
 
 class UpdateCartOrderForm(forms.Form):
-    product = forms.UUIDField(required=True)
+    product = forms.UUIDField(required=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, *kwargs)
         self.instance = kwargs['instance']
 
-    def clean_product_id(self):
-        try:
-            product = Product.objects.get(id=self.cleaned_data['product'])
-        except Product.DoesNotExist:
-            raise ValidationError('Wrong product id.')
-        return product
+    def clean(self):
+        # todo divide logic
+        product_id = self.cleaned_data.get('product')
+        if product_id:
+            try:
+                Product.objects.get(id=product_id)
+            except Product.DoesNotExist:
+                raise ValidationError('Wrong product id.')
+        return self.cleaned_data
 
     def save(self, action):
+        if action == 'clear':
+            self.instance.products.clear()
+            return
+        elif action == 'pay':
+            self.instance.pay()
+            return
         getattr(self.instance.products, action)(self.cleaned_data['product'])
 
 
@@ -29,7 +39,7 @@ class RecalculateCartForm(forms.Form):
         self.instance = kwargs['instance']
         self.fields = {k: forms.IntegerField() if k.startswith(
             'quantity') else forms.UUIDField() for k in self.data.keys() if
-                       k != 'csrfmiddlewaretoken'}
+                       k.startswith(('quantity', 'product'))}
 
     def save(self):
         """
@@ -45,6 +55,31 @@ class RecalculateCartForm(forms.Form):
             if k.startswith('product_'):
                 index = k.split('_')[-1]
                 self.instance.products.through.objects \
-                    .filter(product_id=self.cleaned_data[f'product_{index}']) \
+                    .filter(order=self.instance,
+                            product_id=self.cleaned_data[f'product_{index}']) \
                     .update(quantity=self.cleaned_data[f'quantity_{index}'])
         return self.instance
+
+
+class ApplyDiscountForm(forms.ModelForm):
+    class Meta:
+        model = Discount
+        fields = ('code',)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, *kwargs)
+        self.order = kwargs['order']
+
+    def clean_code(self):
+        try:
+            self.instance = Discount.objects.get(
+                code=self.cleaned_data['code'],
+                is_active=True
+            )
+        except Discount.DoesNotExist:
+            raise ValidationError('Wrong discount code.')
+        return self.cleaned_data['code']
+
+    def apply(self):
+        self.order.discount = self.instance
+        self.order.save(update_fields=('discount',))
