@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.urls import path, re_path
 
 from orders.views import CartView, UpdateCartView, RecalculateCartView, \
@@ -6,10 +7,12 @@ from orders.views import CartView, UpdateCartView, RecalculateCartView, \
 urlpatterns = [
     path('cart/', CartView.as_view(), name='cart'),
     re_path(r'cart/(?P<action>add|remove|clear|pay)/',
-            UpdateCartView.as_view(),
+            login_required(UpdateCartView.as_view()),
             name='update_cart'),
-    path('recalculate/', RecalculateCartView.as_view(),
+    path('recalculate/',
+         login_required(RecalculateCartView.as_view()),
          name='recalculate_cart'),
-    path('apply-discount/', ApplyDiscountView.as_view(),
+    path('apply-discount/',
+         login_required(ApplyDiscountView.as_view()),
          name='apply_discount'),
 ]
