@@ -2,7 +2,8 @@ import csv
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.http import HttpResponse
+from django.db.models import OuterRef, Exists
+from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
@@ -10,17 +11,26 @@ from django.views.generic import ListView, DetailView, TemplateView, FormView
 from weasyprint import HTML
 
 from products.forms import ImportCSVForm
-from products.models import Product
+from products.models import Product, FavoriteProduct
 
 
 class ProductsView(ListView):
     model = Product
 
     def get_queryset(self):
-        return self.model.get_products()
+        qs = self.model.get_products()
+        if self.request.user.is_authenticated:
+            sq = FavoriteProduct.objects.filter(
+                product=OuterRef('id'),
+                user=self.request.user
+            )
+            qs = qs \
+                .prefetch_related('in_favorites') \
+                .annotate(is_favorite=Exists(sq))
+        return qs
 
 
-class ProductDetail(DetailView):
+class ProductDetailView(DetailView):
     model = Product
 
 
@@ -85,3 +95,22 @@ class ImportCSV(FormView):
     def form_valid(self, form):
         form.save()
         return super().form_valid(form)
+
+
+class FavoriteProductsView(ListView):
+    model = FavoriteProduct
+
+
+class FavoriteProductAddOrRemoveView(DetailView):
+    model = Product
+
+    def get(self, request, *args, **kwargs):
+        product = self.get_object()
+        user = request.user
+        favorite, created = FavoriteProduct.objects.get_or_create(
+            product=product,
+            user=user
+        )
+        if not created:
+            favorite.delete()
+        return HttpResponseRedirect(reverse_lazy('products'))

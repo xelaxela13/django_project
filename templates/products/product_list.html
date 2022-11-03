@@ -12,13 +12,13 @@
                 {% for product in object_list %}
                     <div class="col {% if product.products.exists %}col-lg-6{% else %}col-lg-3{% endif %}">
                         <div class="card mb-3">
-                        {% if product.image %}
-                            <figure class="text-center">
-                                <img src="{{ product.image.url }}"
-                                     class="product-image p-3"
-                                     alt="{{ product.name }}">
-                            </figure>
-                        {% endif %}
+                            {% if product.image %}
+                                <figure class="text-center">
+                                    <img src="{{ product.image.url }}"
+                                         class="product-image p-3"
+                                         alt="{{ product.name }}">
+                                </figure>
+                            {% endif %}
                             <div class="card-body">
                                 <h5 class="card-title">{{ product.name }}</h5>
                                 <p class="small">{{ product.category.name }}</p>
@@ -26,7 +26,37 @@
                                     {{ product.description|truncatewords:16 }}
                                 </p>
                                 <p>
-                                    <a href="{% url 'product_detail' product.id %}">Details...</a>
+                                    <a href="{% url 'product_detail' product.id %}"
+                                       class="pe-3">
+                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                             width="16" height="16"
+                                             fill="currentColor"
+                                             class="bi bi-arrows-fullscreen"
+                                             viewBox="0 0 16 16">
+                                            <path fill-rule="evenodd"
+                                                  d="M5.828 10.172a.5.5 0 0 0-.707 0l-4.096 4.096V11.5a.5.5 0 0 0-1 0v3.975a.5.5 0 0 0 .5.5H4.5a.5.5 0 0 0 0-1H1.732l4.096-4.096a.5.5 0 0 0 0-.707zm4.344 0a.5.5 0 0 1 .707 0l4.096 4.096V11.5a.5.5 0 1 1 1 0v3.975a.5.5 0 0 1-.5.5H11.5a.5.5 0 0 1 0-1h2.768l-4.096-4.096a.5.5 0 0 1 0-.707zm0-4.344a.5.5 0 0 0 .707 0l4.096-4.096V4.5a.5.5 0 1 0 1 0V.525a.5.5 0 0 0-.5-.5H11.5a.5.5 0 0 0 0 1h2.768l-4.096 4.096a.5.5 0 0 0 0 .707zm-4.344 0a.5.5 0 0 1-.707 0L1.025 1.732V4.5a.5.5 0 0 1-1 0V.525a.5.5 0 0 1 .5-.5H4.5a.5.5 0 0 1 0 1H1.732l4.096 4.096a.5.5 0 0 1 0 .707z"/>
+                                        </svg></a>
+                                    <a href="{% url 'add_or_remove_favorite' product.id %}"
+                                       class="pe-3">
+                                        {% if not product.is_favorite %}
+                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                             width="16" height="16"
+                                             fill="currentColor"
+                                             class="bi bi-heart"
+                                             viewBox="0 0 16 16">
+                                            <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
+                                        </svg>
+                                        {% else %}
+                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                             width="16" height="16"
+                                             fill="currentColor"
+                                             class="bi bi-heart-fill"
+                                             viewBox="0 0 16 16">
+                                            <path fill-rule="evenodd"
+                                                  d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
+                                        </svg>
+                                        {% endif %}
+                                    </a>
                                 </p>
                                 {% if product.products.exists %}
                                     <p>Including:</p>

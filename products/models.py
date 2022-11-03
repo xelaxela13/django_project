@@ -1,6 +1,7 @@
 import decimal
 from os import path
 
+from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.db import models
 from django_lifecycle import LifecycleModelMixin, hook, AFTER_UPDATE, \
@@ -86,3 +87,19 @@ class Product(LifecycleModelMixin, PKMixin):
     def order_after_update_or_create(self):
         cache.delete(self._products_cache_key)
         cache.delete(self._product_cache_key)
+
+
+class FavoriteProduct(PKMixin):
+    user = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.CASCADE,
+        related_name='favorite_products'
+    )
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.CASCADE,
+        related_name='in_favorites'
+    )
+
+    class Meta:
+        unique_together = ('user', 'product')
