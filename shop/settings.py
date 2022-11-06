@@ -169,3 +169,8 @@ CACHES = {
         'LOCATION': 'django_cache',
     }
 }
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'users.backends.PhoneModelBackend'
+]
