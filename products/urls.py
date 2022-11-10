@@ -15,7 +15,7 @@ urlpatterns = [
     path('favorites/',
          login_required(FavoriteProductsView.as_view()),
          name='favorites'),
-    path('favorites/<uuid:pk>/add/',
+    path('favorites/<uuid:pk>/',
          login_required(FavoriteProductAddOrRemoveView.as_view()),
          name='add_or_remove_favorite'),
 ]
