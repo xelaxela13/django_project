@@ -42,6 +42,12 @@
                         over the years, sometimes by accident, sometimes on
                         purpose (injected humour and the like).
                     </p>
+                    <p>
+                        <form method="post">
+                            {% include 'parts/forms/simple_form.html' with form=form %}
+                            <input type="submit" value="Send" class="btn btn-primary my-3">
+                        </form>
+                    </p>
                 </div>
             </div>
         </div>
