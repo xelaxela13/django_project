@@ -19,3 +19,4 @@ pytest-django==4.5.2
 pytest-mock==3.10.0
 coverage==6.5.0
 gunicorn==20.1.0
+dj-database-url==1.0.0
