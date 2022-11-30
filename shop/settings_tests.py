@@ -9,3 +9,10 @@ for i in REMOVE_MIDDLEWARE:
         ...
 
 CELERY_TASK_ALWAYS_EAGER = True
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+    }
+}
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

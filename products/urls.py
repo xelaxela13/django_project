@@ -5,7 +5,7 @@ from products.views import ProductsView, ProductDetailView, export_csv, \
     ExportPDF, ImportCSV, FavoriteProductsView, FavoriteProductAddOrRemoveView
 
 urlpatterns = [
-    path('products/', ProductsView.as_view(), name='products'),
+    path('products/', login_required(ProductsView.as_view()), name='products'),
     path('products/csv/', export_csv, name='export_csv'),
     path('products/import/csv/', ImportCSV.as_view(), name='import_csv'),
     path('products/pdf/', ExportPDF.as_view(), name='export_pdf'),

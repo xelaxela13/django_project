@@ -83,7 +83,8 @@ class Product(LifecycleModelMixin, PKMixin):
     def curs(self) -> decimal.Decimal:
         return CurrencyHistory.last_curs(self.currency)
 
-    @hook(AFTER_UPDATE, AFTER_CREATE)
+    @hook(AFTER_UPDATE)
+    @hook(AFTER_CREATE)
     def order_after_update_or_create(self):
         cache.delete(self._products_cache_key)
         cache.delete(self._product_cache_key)
