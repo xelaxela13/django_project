@@ -146,7 +146,7 @@ STATIC_ROOT = 'static'
 STATICFILES_DIRS = ['static_dev']
 
 MEDIA_URL = 'media/'
-MEDIA_ROOT = 'media'
+MEDIA_ROOT = 'media_new'
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
@@ -168,10 +168,10 @@ CELERY_BEAT_SCHEDULE = {
 
 CACHES = {
     'default': {
-        'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
-        'LOCATION': env('MEMCACHE_LOCATION', default='MEMCACHE_LOCATION'),
-        # 'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-        # 'LOCATION': 'django_cache',
+        # 'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
+        # 'LOCATION': env('MEMCACHE_LOCATION', default='MEMCACHE_LOCATION'),
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': 'django_cache',
     }
 }
 
