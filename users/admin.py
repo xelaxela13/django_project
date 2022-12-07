@@ -23,10 +23,11 @@ class UserAdmin(AuthUserAdmin):
         (None, {'fields': ('email', 'password')}),
         (_('Personal info'),
          {'fields': ('first_name', 'last_name', 'phone',
-                     'is_phone_valid')}),
+                     'is_phone_valid', 'is_active')}),
         (_('Info'),
          {'fields': ('last_login', 'date_joined',)}),
     )
     list_display = (
-        'id', 'email', 'phone', 'first_name', 'last_name', 'is_staff')
+        'id', 'email', 'phone', 'first_name', 'last_name', 'is_staff',
+        'is_active')
     ordering = ('email',)
