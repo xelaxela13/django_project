@@ -7,6 +7,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import FileExtensionValidator
 
 from products.models import Product, Category
+from shop.model_choices import Currency
 
 
 class ImportCSVForm(forms.Form):
@@ -40,3 +41,16 @@ class ImportCSVForm(forms.Form):
     def save(self):
         products_list = self.cleaned_data['file']
         Product.objects.bulk_create(products_list)
+
+
+class ProductFilterForm(forms.Form):
+    category = forms.ModelChoiceField(
+        required=False,
+        queryset=Category.objects.all(),
+        empty_label="Select"
+    )
+    currency = forms.ChoiceField(
+        required=False,
+        choices=[('', 'Select')] + Currency.choices,
+    )
+    name = forms.CharField(max_length=255, required=False)
