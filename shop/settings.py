@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'silk',
     'debug_toolbar',
     'widget_tweaks',
+    'rest_framework',
     # own apps
     'products',
     'orders',
