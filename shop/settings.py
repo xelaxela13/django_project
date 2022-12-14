@@ -51,6 +51,10 @@ INSTALLED_APPS = [
     'django_extensions',
     'django_celery_results',
     'django_celery_beat',
+    'silk',
+    'debug_toolbar',
+    'widget_tweaks',
+    'rest_framework',
     # own apps
     'products',
     'orders',
@@ -69,7 +73,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'shop.middlewares.ErrorTraceMiddleware'
+    'shop.middlewares.ErrorTraceMiddleware',
+    'silk.middleware.SilkyMiddleware',
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
 
 ROOT_URLCONF = 'shop.urls'
@@ -85,6 +91,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'shop.context_processors.own_settings'
             ],
         },
     },
@@ -168,4 +175,26 @@ CACHES = {
         'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
         'LOCATION': 'django_cache',
     }
+}
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'users.backends.PhoneModelBackend'
+]
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = env('EMAIL_HOST', default='EMAIL_HOST')
+EMAIL_PORT = env('EMAIL_PORT', default='EMAIL_PORT')
+EMAIL_HOST_USER = env('EMAIL_HOST_USER', default='EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', default='EMAIL_HOST_PASSWORD')
+EMAIL_USE_TLS = env('EMAIL_USE_TLS', default=True)
+
+ADMINS = [('Alex', env('ADMIN_EMAIL', default='ADMIN_EMAIL'))]
+MANAGERS = ADMINS
+EMAIL_SUBJECT_PREFIX = 'Super shop - '
+SERVER_EMAIL = EMAIL_HOST_USER
+
+DEBUG_TOOLBAR_CONFIG = {
+    'INSERT_BEFORE': '</head>',
+    'SHOW_TOOLBAR_CALLBACK': lambda x: DEBUG
 }

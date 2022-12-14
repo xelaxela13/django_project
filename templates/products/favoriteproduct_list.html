@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load breadcrumbs %}
+{% load static %}
+{% block breadcrumbs %}
+    {% breadcrumbs 'Home,main,0' 'Products,products,0' 'Favorites,favorites,1' as tags %}
+    {% include 'parts/breadcrumbs.html' with tags=tags %}
+{% endblock breadcrumbs %}
+{% block content %}
+    <section>
+        <div class="container">
+            <div class="row">
+                {% for favorite in object_list %}
+                    <div class="col {% if favorite.product.products.exists %}col-lg-6{% else %}col-lg-3{% endif %}">
+                        <div class="card mb-3">
+                            {% if favorite.product.image %}
+                                <figure class="text-center">
+                                    <img src="{{ favorite.product.image.url }}"
+                                         class="product-image p-3"
+                                         alt="{{ favorite.product.name }}">
+                                </figure>
+                            {% endif %}
+                            <div class="card-body">
+                                <h5 class="card-title">{{ favorite.product.name }}</h5>
+                                <p class="small">{{ favorite.product.category.name }}</p>
+                                <p class="card-text">
+                                    {{ favorite.product.description|truncatewords:16 }}
+                                </p>
+                                {% if favorite.product.products.exists %}
+                                    <p>Including:</p>
+                                    {% for sub in favorite.product.products.iterator %}
+                                        <div class="d-inline-flex flex-column rounded border p-2">
+                                            <p>{{ sub.name }}</p>
+                                            <figure class="text-center d-inline">
+                                                <img src="{{ sub.image.url }}"
+                                                     class="product-image p-3"
+                                                     alt="{{ favorite.product.name }}">
+                                            </figure>
+                                        </div>
+                                    {% endfor %}
+                                {% endif %}
+                                <div class="text-center">
+                                    <div class="h3">
+                                        {{ favorite.product.exchange_price }} UAH
+                                    </div>
+                                    <p>
+                                        {% include 'parts/forms/add_to_cart.html' with product_id=favorite.product.id %}
+                                    </p>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <h3>Your cart is empty.</h3>
+                        <p>Goto <a href="{% url 'products' %}">products</a>
+                            page and add something good to favorite.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+{% endblock content %}

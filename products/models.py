@@ -1,8 +1,11 @@
 import decimal
 from os import path
 
+from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.db import models
+from django_lifecycle import LifecycleModelMixin, hook, AFTER_UPDATE, \
+    AFTER_CREATE
 
 from currencies.models import CurrencyHistory
 from shop.constants import MAX_DIGITS, DECIMAL_PLACES
@@ -25,7 +28,7 @@ class Category(PKMixin):
         return self.name
 
 
-class Product(PKMixin):
+class Product(LifecycleModelMixin, PKMixin):
     name = models.CharField(max_length=255)
     description = models.TextField()
     image = models.ImageField(upload_to=upload_image)
@@ -50,24 +53,26 @@ class Product(PKMixin):
     )
     products = models.ManyToManyField('products.Product', blank=True)
 
+    _products_cache_key = 'products'
+
     def __str__(self):
         return f'{self.name} | {self.price} | {self.sku}'
 
-    @classmethod
-    def _cache_key(cls):
-        return 'products'
+    @property
+    def _product_cache_key(self):
+        return f'product_{self.id}'
 
     @classmethod
     def get_products(cls):
-        products = cache.get(cls._cache_key())
+        products = cache.get(cls._products_cache_key)
         if not products:
             products = Product.objects.all()
-            cache.set(cls._cache_key(), products)
+            cache.set(cls._products_cache_key, products)
         return products
 
     @property
     def exchange_price(self):
-        key = f'exchange_price_{self.id}'
+        key = self._product_cache_key
         exchange_price = cache.get(key)
         if not exchange_price:
             exchange_price = round(self.price * self.curs, 2)
@@ -77,3 +82,27 @@ class Product(PKMixin):
     @property
     def curs(self) -> decimal.Decimal:
         return CurrencyHistory.last_curs(self.currency)
+
+    @hook(AFTER_CREATE)
+    def order_after_create(self):
+        cache.delete(self._products_cache_key)
+
+    @hook(AFTER_UPDATE)
+    def order_after_update(self):
+        cache.delete(self._product_cache_key)
+
+
+class FavoriteProduct(PKMixin):
+    user = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.CASCADE,
+        related_name='favorite_products'
+    )
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.CASCADE,
+        related_name='in_favorites'
+    )
+
+    class Meta:
+        unique_together = ('user', 'product')
