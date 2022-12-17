@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'debug_toolbar',
     'widget_tweaks',
     'rest_framework',
+    'drf_yasg',
     # own apps
     'products',
     'orders',
