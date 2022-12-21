@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'debug_toolbar',
     'widget_tweaks',
     'rest_framework',
+    'rest_framework.authtoken',
     'drf_yasg',
     # own apps
     'products',
@@ -198,4 +199,9 @@ SERVER_EMAIL = EMAIL_HOST_USER
 DEBUG_TOOLBAR_CONFIG = {
     'INSERT_BEFORE': '</head>',
     'SHOW_TOOLBAR_CALLBACK': lambda x: DEBUG
+}
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'api.authentication.TokenAuthentication',
+    ]
 }
