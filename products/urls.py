@@ -2,7 +2,8 @@ from django.contrib.auth.decorators import login_required
 from django.urls import path
 
 from products.views import ProductsView, ProductDetailView, export_csv, \
-    ExportPDF, ImportCSV, FavoriteProductsView, FavoriteProductAddOrRemoveView
+    ExportPDF, ImportCSV, FavoriteProductsView, \
+    FavoriteProductAddOrRemoveView, AJAXFavoriteProductAddOrRemoveView
 
 urlpatterns = [
     path('products/', login_required(ProductsView.as_view()), name='products'),
@@ -18,4 +19,7 @@ urlpatterns = [
     path('favorites/<uuid:pk>/',
          login_required(FavoriteProductAddOrRemoveView.as_view()),
          name='add_or_remove_favorite'),
+    path('ajax-favorites/<uuid:pk>/',
+         AJAXFavoriteProductAddOrRemoveView.as_view(),
+         name='ajax_add_or_remove_favorite'),
 ]

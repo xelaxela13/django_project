@@ -4,16 +4,20 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.paginator import Paginator
 from django.db.models import OuterRef, Exists
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.template import loader
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
+from django.views import View
 from django.views.generic import ListView, DetailView, TemplateView, FormView
+from django_filters.views import FilterView
 from weasyprint import HTML
 
-from products.forms import ImportCSVForm, ProductFilterForm
+from products.filters import ProductFilter
+from products.forms import ImportCSVForm
 from products.models import Product, FavoriteProduct
+from shop.decorators import ajax_required
 
 
 def products(request, *args, **kwargs):
@@ -27,26 +31,14 @@ def products(request, *args, **kwargs):
                   template_name='products/product_list.html')
 
 
-class ProductsView(ListView):
+class ProductsView(FilterView):
     model = Product
     paginate_by = 10
-    filter_form = ProductFilterForm
-
-    def filtered_queryset(self, queryset):
-        category_id = self.request.GET.get('category')
-        currency = self.request.GET.get('currency')
-        name = self.request.GET.get('name')
-        if category_id:
-            queryset = queryset.filter(category_id=category_id)
-        if currency:
-            queryset = queryset.filter(currency=currency)
-        if name:
-            queryset = queryset.filter(name__icontains=name)
-        return queryset
+    filterset_class = ProductFilter
+    template_name_suffix = '_list'
 
     def get_queryset(self):
         qs = self.model.get_products()
-        qs = self.filtered_queryset(qs)
         if self.request.user.is_authenticated:
             sq = FavoriteProduct.objects.filter(
                 product=OuterRef('id'),
@@ -56,13 +48,6 @@ class ProductsView(ListView):
                 .prefetch_related('in_favorites') \
                 .annotate(is_favorite=Exists(sq))
         return qs
-
-    def get_context_data(self, *, object_list=None, **kwargs):
-        context = super().get_context_data(object_list=None, **kwargs)
-        context.update(
-            {'filter_form': self.filter_form}
-        )
-        return context
 
 
 class ProductDetailView(DetailView):
@@ -155,3 +140,14 @@ class FavoriteProductAddOrRemoveView(DetailView):
         if not created:
             favorite.delete()
         return HttpResponseRedirect(reverse_lazy('products'))
+
+
+class AJAXFavoriteProductAddOrRemoveView(View):
+
+    @method_decorator(ajax_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        data = {}
+        return JsonResponse(data=data)

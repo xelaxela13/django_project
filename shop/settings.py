@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'rest_framework',
     'rest_framework.authtoken',
+    'django_filters',
     'drf_yasg',
     # own apps
     'products',
