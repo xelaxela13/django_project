@@ -142,12 +142,20 @@ class FavoriteProductAddOrRemoveView(DetailView):
         return HttpResponseRedirect(reverse_lazy('products'))
 
 
-class AJAXFavoriteProductAddOrRemoveView(View):
+class AJAXFavoriteProductAddOrRemoveView(DetailView):
+    model = Product
 
     @method_decorator(ajax_required)
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
-        data = {}
-        return JsonResponse(data=data)
+        product = self.get_object()
+        user = request.user
+        favorite, created = FavoriteProduct.objects.get_or_create(
+            product=product,
+            user=user
+        )
+        if not created:
+            favorite.delete()
+        return JsonResponse(data={'created': created})
