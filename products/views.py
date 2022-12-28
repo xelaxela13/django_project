@@ -9,7 +9,6 @@ from django.shortcuts import render
 from django.template import loader
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
-from django.views import View
 from django.views.generic import ListView, DetailView, TemplateView, FormView
 from django_filters.views import FilterView
 from weasyprint import HTML
