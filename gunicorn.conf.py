@@ -1,4 +1,4 @@
 import multiprocessing
-
-bind = "127.0.0.1:9000"
+import os
+bind = f"0.0.0.0:{os.environ.get('GUNICORN_PORT')}"
 workers = multiprocessing.cpu_count() * 2 + 1

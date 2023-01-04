@@ -46,7 +46,7 @@ class Parser(BaseClient):
                             'sku': element.attrs['data-product-id'],
                         }
                     )
-                except (AssertionError, KeyError) as err:
+                except (AttributeError, KeyError) as err:
                     logger.error(err)
             return products_list
 
