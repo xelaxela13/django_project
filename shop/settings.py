@@ -210,8 +210,7 @@ REST_FRAMEWORK = {
     ]
 }
 
-
 try:
-    from shop.settings_local import *
+    from shop.settings_local import *  # noqa
 except ImportError:
     ...
